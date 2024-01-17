@@ -13,6 +13,13 @@ const loadList = async () => {
 onMounted(() => {
   loadList()
 })
+
+const options = [
+  { label: '男', value: 1 },
+  { label: '女', value: 0 }
+]
+
+const gender = ref(1)
 </script>
 
 <template>
@@ -31,11 +38,12 @@ onMounted(() => {
         <div class="icon"><cp-icon name="user-edit" /></div>
         <div class="tag" v-if="item.defaultFlag === 1">默认</div>
       </div>
-      <div class="patient-add" v-if="list.length < 6">
+      <div class="patient-add">
         <cp-icon name="user-add" />
         <p>添加患者</p>
       </div>
-      <div class="patient-tip">最多可添加 6 人</div>
+      <div class="patient-tip" v-if="list.length < 6">最多可添加 6 人</div>
+      <cp-radio-btn :options="options" v-model="gender"></cp-radio-btn>
     </div>
   </div>
 </template>
@@ -110,6 +118,7 @@ onMounted(() => {
   color: var(--cp-primary);
   text-align: center;
   padding: 15px 0;
+  margin-bottom: 15px;
   border-radius: 8px;
   .cp-icon {
     font-size: 24px;
