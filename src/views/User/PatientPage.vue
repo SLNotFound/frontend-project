@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { getPatientList } from '@/services/user'
-import type { PatientList } from '@/types/user'
-import { onMounted, ref } from 'vue'
+import type { Patient, PatientList } from '@/types/user'
+import { computed, onMounted, ref } from 'vue'
 
 const list = ref<PatientList>([])
 
@@ -23,8 +23,34 @@ const gender = ref(1)
 
 const show = ref(false)
 const showPopup = () => {
+  patient.value = { ...initPatient }
   show.value = true
 }
+
+// const patient = ref<Patient>({
+//   name: '',
+//   idCard: '',
+//   gender: 1,
+//   defaultFlag: 0
+// })
+
+const defaultFlag = computed({
+  get() {
+    return patient.value.defaultFlag === 1 ? true : false
+  },
+  set(value) {
+    patient.value.defaultFlag = value ? 1 : 0
+  }
+})
+
+// 打开侧边栏重置表单
+const initPatient: Patient = {
+  name: '',
+  idCard: '',
+  gender: 1,
+  defaultFlag: 0
+}
+const patient = ref<Patient>({ ...initPatient })
 </script>
 
 <template>
@@ -57,17 +83,28 @@ const showPopup = () => {
         :back="() => (show = false)"
       ></cp-nav-bar>
       <van-form autocomplete="off" ref="form">
-        <van-field label="真实姓名" placeholder="请输入真实姓名" />
-        <van-field label="身份证号" placeholder="请输入身份证号" />
+        <van-field
+          v-model="patient.name"
+          label="真实姓名"
+          placeholder="请输入真实姓名"
+        />
+        <van-field
+          v-model="patient.idCard"
+          label="身份证号"
+          placeholder="请输入身份证号"
+        />
         <van-field label="性别" class="pb4">
           <!-- 单选按钮组件 -->
           <template #input>
-            <cp-radio-btn :options="options" v-model="gender"></cp-radio-btn>
+            <cp-radio-btn
+              :options="options"
+              v-model="patient.gender"
+            ></cp-radio-btn>
           </template>
         </van-field>
         <van-field label="默认就诊人">
           <template #input>
-            <van-checkbox :icon-size="18" round />
+            <van-checkbox v-model="defaultFlag" :icon-size="18" round />
           </template>
         </van-field>
       </van-form>
