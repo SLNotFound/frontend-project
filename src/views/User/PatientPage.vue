@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { getPatientList } from '@/services/user'
+import { addPatient, getPatientList } from '@/services/user'
 import type { Patient, PatientList } from '@/types/user'
 import { idCardRules, nameRules } from '@/utils/rules'
-import { showConfirmDialog, type FormInstance } from 'vant'
+import { showConfirmDialog, type FormInstance, showSuccessToast } from 'vant'
 import { computed, onMounted, ref } from 'vue'
 
 const list = ref<PatientList>([])
@@ -64,6 +64,11 @@ const onSubmit = async () => {
       message: '填写的性别和身份证中的不一致\n您确认提交吗?'
     })
   }
+
+  await addPatient(patient.value)
+  show.value = false
+  loadList()
+  showSuccessToast('添加成功')
 }
 </script>
 
