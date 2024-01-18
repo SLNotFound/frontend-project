@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { getPatientList } from '@/services/user'
 import type { Patient, PatientList } from '@/types/user'
+import { idCardRules, nameRules } from '@/utils/rules'
+import { showConfirmDialog, type FormInstance } from 'vant'
 import { computed, onMounted, ref } from 'vue'
 
 const list = ref<PatientList>([])
@@ -51,6 +53,18 @@ const initPatient: Patient = {
   defaultFlag: 0
 }
 const patient = ref<Patient>({ ...initPatient })
+
+const form = ref<FormInstance>()
+const onSubmit = async () => {
+  await form.value?.validate()
+  const gender = +patient.value.idCard.slice(-2, -1) % 2
+  if (gender !== patient.value.gender) {
+    await showConfirmDialog({
+      title: '温馨提示',
+      message: '填写的性别和身份证中的不一致\n您确认提交吗?'
+    })
+  }
+}
 </script>
 
 <template>
@@ -81,17 +95,20 @@ const patient = ref<Patient>({ ...initPatient })
         title="添加患者"
         right-text="保存"
         :back="() => (show = false)"
+        @click-right="onSubmit"
       ></cp-nav-bar>
       <van-form autocomplete="off" ref="form">
         <van-field
           v-model="patient.name"
           label="真实姓名"
           placeholder="请输入真实姓名"
+          :rules="nameRules"
         />
         <van-field
           v-model="patient.idCard"
           label="身份证号"
           placeholder="请输入身份证号"
+          :rules="idCardRules"
         />
         <van-field label="性别" class="pb4">
           <!-- 单选按钮组件 -->
