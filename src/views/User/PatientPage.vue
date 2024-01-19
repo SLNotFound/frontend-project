@@ -1,5 +1,10 @@
 <script setup lang="ts">
-import { addPatient, editPatient, getPatientList } from '@/services/user'
+import {
+  addPatient,
+  delPatient,
+  editPatient,
+  getPatientList
+} from '@/services/user'
 import type { Patient, PatientList } from '@/types/user'
 import { idCardRules, nameRules } from '@/utils/rules'
 import { showConfirmDialog, type FormInstance, showSuccessToast } from 'vant'
@@ -79,6 +84,20 @@ const onSubmit = async () => {
   loadList()
   patient.value.id ? showSuccessToast('更新成功') : showSuccessToast('添加成功')
 }
+
+const remove = async () => {
+  if (patient.value.id) {
+    await showConfirmDialog({
+      title: '温馨提示',
+      message: `您确认要删除 ${patient.value.name} 的信息吗？`
+    })
+
+    await delPatient(patient.value.id)
+    show.value = false
+    loadList()
+    showSuccessToast('删除成功')
+  }
+}
 </script>
 
 <template>
@@ -141,6 +160,12 @@ const onSubmit = async () => {
           </template>
         </van-field>
       </van-form>
+      <van-action-bar v-if="patient.id">
+        <van-action-bar-button
+          text="删除"
+          @click="remove"
+        ></van-action-bar-button>
+      </van-action-bar>
     </van-popup>
   </div>
 </template>
@@ -155,6 +180,15 @@ const onSubmit = async () => {
       padding-top: 46px;
       box-sizing: border-box;
     }
+  }
+}
+
+.van-action-bar {
+  padding: 0 10px;
+  margin-bottom: 10px;
+  .van-button {
+    color: var(--cp-price);
+    background-color: var(--cp-bg);
   }
 }
 .patient-list {
