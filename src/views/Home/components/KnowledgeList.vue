@@ -1,6 +1,11 @@
 <script setup lang="ts">
 import KnowledgeCard from './KnowledgeCard.vue'
 import { ref } from 'vue'
+import type { KnowledgeType } from '@/types/consult'
+
+defineProps<{
+  type: KnowledgeType
+}>()
 
 const loading = ref(false)
 const finished = ref(false)
