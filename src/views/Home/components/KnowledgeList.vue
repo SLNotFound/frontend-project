@@ -1,26 +1,37 @@
 <script setup lang="ts">
-import KnowledgeCard from './KnowledgeCard.vue'
 import { ref } from 'vue'
-import type { KnowledgeType } from '@/types/consult'
+import type {
+  KnowledgeType,
+  KnowledgeList,
+  KnowledgeParams
+} from '@/types/consult'
+import { getKnowledgePage } from '@/services/consult'
+import KnowledgeCard from './KnowledgeCard.vue'
 
-defineProps<{
+const props = defineProps<{
   type: KnowledgeType
 }>()
 
 const loading = ref(false)
 const finished = ref(false)
 
-const list = ref<number[]>([])
+const list = ref<KnowledgeList>([])
 
-const onLoad = () => {
-  const data = [1, 2, 3, 4, 5]
-  setTimeout(() => {
-    list.value.push(...data)
-    if (list.value.length > 20) {
-      finished.value = true
-    }
-    loading.value = false
-  }, 2000)
+const params = ref<KnowledgeParams>({
+  type: props.type,
+  current: 1,
+  pageSize: 10
+})
+
+const onLoad = async () => {
+  const res = await getKnowledgePage(params.value)
+  list.value.push(...res.data.rows)
+  if (params.value.current >= res.data.pageTotal) {
+    finished.value = true
+  } else {
+    params.value.current++
+  }
+  loading.value = false
 }
 </script>
 
@@ -32,7 +43,11 @@ const onLoad = () => {
       finished-text="没有更多了"
       @load="onLoad"
     >
-      <knowledge-card v-for="(item, i) in list" :key="i"></knowledge-card>
+      <knowledge-card
+        v-for="item in list"
+        :key="item.id"
+        :item="item"
+      ></knowledge-card>
     </van-list>
   </div>
 </template>
