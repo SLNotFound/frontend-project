@@ -7,7 +7,7 @@ import { ref, onMounted } from 'vue'
 
 const { width } = useWindowSize()
 
-const list = ref<DoctorList>()
+const list = ref<DoctorList>([])
 
 const loadData = async () => {
   const res = await getDoctorPage({ current: 1, pageSize: 5 })
