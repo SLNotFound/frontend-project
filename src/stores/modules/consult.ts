@@ -13,7 +13,10 @@ export const useConsultStore = defineStore(
 
     // 设置极速问诊类型
     const setIllnessType = (type: 0 | 1) => (consult.value.illnessType = type)
-    return { consult, setType, setIllnessType }
+
+    // 设置科室
+    const setDep = (id: string) => (consult.value.depId = id)
+    return { consult, setType, setIllnessType, setDep }
   },
   {
     persist: true
