@@ -2,6 +2,11 @@
 import { IllnessTime } from '@/enums'
 import type { ConsultIllness } from '@/types/consult'
 import { ref } from 'vue'
+import type {
+  UploaderAfterRead,
+  UploaderFileListItem
+} from 'vant/lib/uploader/types'
+import { uploadImage } from '@/services/consult'
 
 const timeOptions = [
   { label: '一周内', value: IllnessTime.Week },
@@ -20,6 +25,30 @@ const form = ref<ConsultIllness>({
   consultFlag: undefined,
   pictures: []
 })
+
+const fileList = ref([])
+const onAfterRead: UploaderAfterRead = (item) => {
+  if (Array.isArray(item)) return
+  if (!item.file) return
+  item.status = 'uploading'
+  item.message = '上传中...'
+  uploadImage(item.file)
+    .then((res) => {
+      item.status = 'done'
+      item.message = undefined
+      item.url = res.data.url
+      form.value.pictures?.push(res.data)
+    })
+    .catch(() => {
+      item.status = 'failed'
+      item.message = '上传失败'
+    })
+}
+const onDeleteImg = (item: UploaderFileListItem) => {
+  form.value.pictures = form.value.pictures?.filter(
+    (pic) => pic.url !== item.url
+  )
+}
 </script>
 
 <template>
@@ -62,12 +91,17 @@ const form = ref<ConsultIllness>({
       </div>
       <div class="illness-img">
         <van-uploader
+          :after-read="onAfterRead"
+          @delete="onDeleteImg"
           max-count="9"
           :max-size="5 * 1024 * 1024"
           upload-icon="photo-o"
           upload-text="上传图片"
+          v-model="fileList"
         ></van-uploader>
-        <p class="tip">上传内容仅医生可见,最多9张图,最大5MB</p>
+        <p class="tip" v-if="!fileList.length">
+          上传内容仅医生可见,最多9张图,最大5MB
+        </p>
       </div>
     </div>
   </div>
