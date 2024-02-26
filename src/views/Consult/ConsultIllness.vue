@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import { IllnessTime } from '@/enums'
-import type { ConsultIllness } from '@/types/consult'
-import { ref, computed } from 'vue'
+import type { ConsultIllness, Image } from '@/types/consult'
+import { ref, computed, onMounted } from 'vue'
 import type {
   UploaderAfterRead,
   UploaderFileListItem
 } from 'vant/lib/uploader/types'
 import { uploadImage } from '@/services/consult'
-import { showToast } from 'vant'
+import { showConfirmDialog, showToast } from 'vant'
 import { useConsultStore } from '@/stores'
 import { useRouter } from 'vue-router'
 
@@ -29,7 +29,7 @@ const form = ref<ConsultIllness>({
   pictures: []
 })
 
-const fileList = ref([])
+const fileList = ref<Image[]>([])
 const onAfterRead: UploaderAfterRead = (item) => {
   if (Array.isArray(item)) return
   if (!item.file) return
@@ -73,6 +73,20 @@ const next = () => {
   store.setIllness(form.value)
   router.push('/user/patient?isChange=1')
 }
+
+onMounted(() => {
+  if (store.consult.illnessDesc) {
+    showConfirmDialog({
+      title: '温馨提示',
+      message: '是否恢复您之前填写的病情信息呢？',
+      closeOnPopstate: false
+    }).then(() => {
+      const { illnessDesc, illnessTime, consultFlag, pictures } = store.consult
+      form.value = { illnessDesc, illnessTime, consultFlag, pictures }
+      fileList.value = pictures || []
+    })
+  }
+})
 </script>
 
 <template>
