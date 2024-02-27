@@ -17,6 +17,7 @@ const loadData = async () => {
   payInfo.value = res.data
 
   // 设置默认优惠券
+  store.setCoupon(res.data.couponId)
 }
 
 const patient = ref<Patient>()
@@ -73,6 +74,10 @@ const agree = ref(false)
       button-text="立即支付"
       text-align="left"
     />
+  </div>
+  <div class="consult-pay-page" v-else>
+    <cp-nav-bar title="支付"></cp-nav-bar>
+    <van-skeleton title :row="10" style="margin-top: 18px"></van-skeleton>
   </div>
 </template>
 
