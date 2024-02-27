@@ -5,7 +5,9 @@ import type {
   KnowledgeParams,
   PageParams,
   TopDep,
-  Image
+  Image,
+  ConsultOrderPreParams,
+  ConsultOrderPreData
 } from '@/types/consult'
 import { request } from '@/utils/request'
 
@@ -25,3 +27,6 @@ export const uploadImage = (file: File) => {
   fd.append('file', file)
   return request<Image>('/upload', 'POST', fd)
 }
+
+export const getConsultOrderPre = (params: ConsultOrderPreParams) =>
+  request<ConsultOrderPreData>('/patient/consult/order/pre', 'GET', params)
